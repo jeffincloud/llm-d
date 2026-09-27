@@ -5,6 +5,7 @@ metadata:
 spec:
   template:
     spec:
+      terminationGracePeriodSeconds: 120  # Must exceed --shutdown-timeout; see docs/operations/graceful-shutdown.md
       containers:
         - name: modelserver
           command: ["vllm", "serve"]
@@ -14,6 +15,7 @@ spec:
             - "--tensor-parallel-size=2"
             - "--mm-processor-cache-gb"
             - "20"
+            - "--shutdown-timeout=90"          # Drain in-flight requests on SIGTERM; see docs/operations/graceful-shutdown.md
 
             # Uncomment for distributed tracing
             # - "--otlp-traces-endpoint=http://otel-collector:4317"

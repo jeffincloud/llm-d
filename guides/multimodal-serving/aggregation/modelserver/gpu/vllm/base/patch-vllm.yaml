@@ -6,6 +6,7 @@ spec:
   replicas: 8
   template:
     spec:
+      terminationGracePeriodSeconds: 120  # Must exceed --shutdown-timeout; see docs/operations/graceful-shutdown.md
       containers:
         - name: modelserver
           resources:

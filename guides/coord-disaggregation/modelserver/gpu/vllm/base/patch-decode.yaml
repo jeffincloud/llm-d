@@ -6,6 +6,7 @@ spec:
   replicas: 4
   template:
     spec:
+      terminationGracePeriodSeconds: 120  # Must exceed --shutdown-timeout; see docs/operations/graceful-shutdown.md
       containers:
         - name: modelserver
           command: ["vllm", "serve"]
@@ -18,6 +19,7 @@ spec:
             - "--kv-transfer-config"
             - '{"kv_connector":"NixlConnector", "kv_role":"kv_both"}'
             - "--no-disable-hybrid-kv-cache-manager"
+            - "--shutdown-timeout=90"          # Drain in-flight requests on SIGTERM; see docs/operations/graceful-shutdown.md
           env:
             - name: MODEL_NAME
               value: "Qwen/Qwen3-VL-32B-Instruct"

@@ -44,6 +44,7 @@ spec:
           resources:
             requests: {cpu: '1', memory: 2Gi}
             limits: {cpu: '2', memory: 4Gi}
+      terminationGracePeriodSeconds: 120  # Must exceed --shutdown-timeout; see docs/operations/graceful-shutdown.md
       containers:
         - name: modelserver
           command: ["vllm", "serve"]
@@ -58,6 +59,7 @@ spec:
             # flag to fall back to the warm-NVMe POSIX-pread path:
             #   --model-loader-extra-config={"nogds": true}
             - "--load-format=fastsafetensors"
+            - "--shutdown-timeout=90"          # Drain in-flight requests on SIGTERM; see docs/operations/graceful-shutdown.md
           securityContext:
             capabilities:
               add: [IPC_LOCK]

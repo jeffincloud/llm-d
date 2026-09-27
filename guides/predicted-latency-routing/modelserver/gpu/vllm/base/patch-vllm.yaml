@@ -6,6 +6,7 @@ spec:
   replicas: 10
   template:
     spec:
+      terminationGracePeriodSeconds: 120  # Must exceed --shutdown-timeout; see docs/operations/graceful-shutdown.md
       containers:
         - name: modelserver
           args:
@@ -14,3 +15,4 @@ spec:
             - "--tensor-parallel-size=2"
             - "--max-model-len=131072"
             - "--hf-overrides={\"rope_scaling\":{\"rope_type\":\"yarn\",\"factor\":3.2,\"original_max_position_embeddings\":40960}}"
+            - "--shutdown-timeout=90"          # Drain in-flight requests on SIGTERM; see docs/operations/graceful-shutdown.md

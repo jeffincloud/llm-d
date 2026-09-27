@@ -14,6 +14,7 @@ spec:
     spec:
       # Attach GKE service account linked to GCP IAM storage permissions
       serviceAccountName: agentic-serving-gpu-vllm-sa
+      terminationGracePeriodSeconds: 120  # Must exceed --shutdown-timeout; see docs/operations/graceful-shutdown.md
       containers:
         - name: modelserver
           command: ["vllm", "serve"]
@@ -34,6 +35,7 @@ spec:
             - '{"enable_multithread_load": true, "num_threads": 96}'
             - "--kv-transfer-config"
             - '{"kv_connector":"MultiConnector","kv_role":"kv_both","kv_load_failure_policy":"fail","kv_connector_extra_config":{"connectors":[{"kv_connector":"NixlConnector","kv_role":"kv_producer","kv_connector_extra_config":{"bidirectional_kv_xfer":true}},{"kv_connector":"OffloadingConnector","kv_role":"kv_both","kv_connector_extra_config":{"cpu_bytes_to_use":214748364800,"lazy_offload":true}}]}}'
+            - "--shutdown-timeout=90"          # Drain in-flight requests on SIGTERM; see docs/operations/graceful-shutdown.md
           env:
             - name: HF_HOME
               value: "/huggingface"

@@ -6,6 +6,7 @@ spec:
   replicas: 8
   template:
     spec:
+      terminationGracePeriodSeconds: 120  # Must exceed --shutdown-timeout; see docs/operations/graceful-shutdown.md
       containers:
         - name: modelserver
           command: ["/bin/bash", "-c"]
@@ -19,6 +20,7 @@ spec:
                 --kv-transfer-config '{"kv_connector":"MooncakeConnector", "kv_role":"kv_producer", "kv_connector_extra_config":{"mooncake_protocol":"rdma"}}' \
                 --gpu-memory-utilization=0.9 \
                 --port 8000
+            - "--shutdown-timeout=90"          # Drain in-flight requests on SIGTERM; see docs/operations/graceful-shutdown.md
           env:
             - name: VLLM_MOONCAKE_BOOTSTRAP_PORT
               value: "8998"

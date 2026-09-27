@@ -8,6 +8,7 @@ spec:
   replicas: 2
   template:
     spec:
+      terminationGracePeriodSeconds: 120  # Must exceed --shutdown-timeout; see docs/operations/graceful-shutdown.md
       containers:
         - name: modelserver
           command: ["vllm", "serve"]
@@ -17,6 +18,7 @@ spec:
             - "--tensor-parallel-size=2"
             - "--gpu-memory-utilization=0.95"
             - "--load-format=mx"
+            - "--shutdown-timeout=90"          # Drain in-flight requests on SIGTERM; see docs/operations/graceful-shutdown.md
           securityContext:
             capabilities:
               add: [IPC_LOCK]
